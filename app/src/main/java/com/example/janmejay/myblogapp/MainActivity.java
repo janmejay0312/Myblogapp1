@@ -2,6 +2,7 @@ package com.example.janmejay.myblogapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 import static android.view.LayoutInflater.*;
@@ -74,7 +77,7 @@ private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
     }
     public static class BlogViewHolder extends RecyclerView.ViewHolder{
 View mView;
-        public BlogViewHolder(View itemView) {
+        private BlogViewHolder(View itemView) {
             super(itemView);
             mView=itemView;
         }
@@ -87,8 +90,10 @@ View mView;
             postDesc.setText(description);
         }
 public void setImage(String image,Context context){
-            ImageView postImage=mView.findViewById(R.id.image1);
-    Glide.with(context).load(image).into(postImage);
+
+    ImageView postImage=mView.findViewById(R.id.image1);
+     Uri file=Uri.parse(image);
+    Glide.with(context).load(file).into(postImage);
 }
     }
 

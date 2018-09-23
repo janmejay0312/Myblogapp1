@@ -4,7 +4,7 @@ public class Blog {
     private String title;
     private String image;
     private String description;
-    public Blog() {}
+    public Blog(){}
     public Blog(String title,String image,String description)
     {
         this.description=description;
