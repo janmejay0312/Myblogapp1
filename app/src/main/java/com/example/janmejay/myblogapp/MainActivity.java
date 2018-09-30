@@ -78,6 +78,7 @@ private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
                     public void onClick(final View v) {
                         Context context=v.getContext();
                         Intent intent=new Intent(context,PostActivity.class);
+                        intent.putExtra("rowId",model.getId());
                         intent.putExtra("title",model.getTitle());
                         intent.putExtra("description",model.getDescription());
                         intent.putExtra("image",model.getImage());

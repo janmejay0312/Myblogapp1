@@ -4,6 +4,7 @@ public class Blog {
     private String title;
     private String image;
     private String description;
+    private String id;
     public Blog(){}
     public Blog(String title,String image,String description)
     {
@@ -34,5 +35,13 @@ public class Blog {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -32,10 +33,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.UUID;
 
 public class PostActivity extends AppCompatActivity {
     private ImageButton addImage;
-    private Button submit,update;
+    private Button submit, update;
     private EditText title;
     private EditText description;
     private Uri uri = null;
@@ -43,7 +45,7 @@ public class PostActivity extends AppCompatActivity {
     private Intent intent;
 
     public static final int GALLERY_REQUEST = 1;
-    private DatabaseReference mDatabase,rdatabase;
+    private DatabaseReference mDatabase, rdatabase;
     private StorageReference mstorage;
     private ProgressDialog progressBar;
     private DatabaseReference databaseReference;
@@ -54,19 +56,29 @@ public class PostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post);
         addImage = findViewById(R.id.imageview);
         submit = findViewById(R.id.button);
-        update=findViewById(R.id.update);
         title = findViewById(R.id.editText);
         description = findViewById(R.id.editText2);
         mstorage = FirebaseStorage.getInstance().getReference();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-       intent = this.getIntent();
+        intent = getIntent();
         if (intent != null) {
-            String Des = intent.getStringExtra("description");
-            String mTitle = intent.getStringExtra("title");
-            String image = intent.getStringExtra("image");
-            Glide.with(this).load(image).into(addImage);
-            description.setText(Des);
-            title.setText(mTitle);
+            if(getIntent().getStringExtra("rowId")!=null){
+                submit.setText("update");
+            }else {
+                submit.setText("submit");
+            }
+            if (intent.getStringExtra("description") != null) {
+                String Des = intent.getStringExtra("description");
+                description.setText(Des);
+            }
+            if (intent.getStringExtra("title") != null) {
+                String mTitle = intent.getStringExtra("title");
+                title.setText(mTitle);
+            }
+            if (intent.getStringExtra("image") != null) {
+                String image = intent.getStringExtra("image");
+                Glide.with(this).load(image).into(addImage);
+            }
         }
         progressBar = new ProgressDialog(this);
 
@@ -79,23 +91,29 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
-            submit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getIntent().getStringExtra("rowId")!=null){
+                    DatabaseReference ref=mDatabase.child(getIntent().getStringExtra("rowId"));
+                    ref.child("description").setValue(description.getText().toString().trim());
+                    ref.child("title").setValue(title.getText().toString().trim());
+                    startActivity(new Intent(PostActivity.this, MainActivity.class));
+                }else {
                     startPosting();
                 }
+            }
 
-            });
+        });
 
 
-        }
-
+    }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK&&data.getData()!=null) {
+        if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK && data.getData() != null) {
             uri = data.getData();
             addImage.setImageURI(uri);
         }
@@ -111,9 +129,9 @@ public class PostActivity extends AppCompatActivity {
             storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
-
-
-                    databaseReference = mDatabase.push();
+                    String id=UUID.randomUUID().toString();
+                    databaseReference = mDatabase.child(id);
+                    databaseReference.child("id").setValue(id);
                     databaseReference.child("title").setValue(s);
                     databaseReference.child("description").setValue(q);
                     progressBar.dismiss();
@@ -126,10 +144,14 @@ public class PostActivity extends AppCompatActivity {
                     });
 
                 }
+
+
             });
+
+
         }
 
-             
 
     }
+
 }
