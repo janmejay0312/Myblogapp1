@@ -16,24 +16,25 @@
     <EditText
         android:id="@+id/editText"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="65dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:ems="10"
-        android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
-        android:inputType="textPersonName"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/text"
-        android:hint="add title"/>
+        android:ems="10"
+        android:hint="add title"
+        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/editText2"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="92dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="114dp"
         android:background="@drawable/text"
         android:ems="10"
         android:hint="add description"
@@ -50,5 +51,13 @@
         android:text="Submit"
         android:layout_marginLeft="11dp"
         android:layout_alignParentLeft="true" />
+
+    <Button
+        android:id="@+id/update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_above="@+id/button"
+        android:text="update" />
 
 </RelativeLayout>
