@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="320dp"
+    android:id="@+id/cardView"
     style="@style/CardView"
 >
 
@@ -14,6 +15,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:contentDescription="@string/app_name"
         android:id="@+id/image1"
          />
     <TextView
