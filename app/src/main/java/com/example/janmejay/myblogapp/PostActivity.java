@@ -47,6 +47,7 @@ public class PostActivity extends AppCompatActivity {
     public static final int GALLERY_REQUEST = 1;
     private DatabaseReference mDatabase, rdatabase;
     private StorageReference mstorage;
+    private StorageReference storageReference;
     private ProgressDialog progressBar;
     private DatabaseReference databaseReference;
 
@@ -57,6 +58,7 @@ public class PostActivity extends AppCompatActivity {
         addImage = findViewById(R.id.imageview);
         submit = findViewById(R.id.button);
         title = findViewById(R.id.editText);
+        Log.d("message","recreated");
         description = findViewById(R.id.editText2);
         mstorage = FirebaseStorage.getInstance().getReference();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -125,7 +127,7 @@ public class PostActivity extends AppCompatActivity {
         final String s = title.getText().toString().trim();
         final String q = description.getText().toString().trim();
         if (!TextUtils.isEmpty(s) && !TextUtils.isEmpty(q) && uri != null) {
-            final StorageReference storageReference = mstorage.child("Photos").child(uri.getLastPathSegment());
+             storageReference = mstorage.child("Photos").child(uri.getLastPathSegment());
             storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {

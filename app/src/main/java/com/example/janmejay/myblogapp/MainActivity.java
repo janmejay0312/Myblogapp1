@@ -2,7 +2,9 @@ package com.example.janmejay.myblogapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +45,7 @@ private CardView cardView;
 private RecyclerView.LayoutManager layoutManager;
 private DatabaseReference mDatabase;
 private Query query;
+   private Button share;
 private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
 
     @Override
@@ -59,38 +64,77 @@ private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
                         .build();
          firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>(options) {
 
-            @NonNull
-            @Override
-            public BlogViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row,parent,false);
+             @NonNull
+             @Override
+             public BlogViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row, parent, false);
 
-                return new BlogViewHolder(view,getApplicationContext());
-            }
+                 return new BlogViewHolder(view, getApplicationContext());
+             }
 
-            @Override
-            protected void onBindViewHolder(@NonNull BlogViewHolder holder, int position, @NonNull final Blog model) {
-                holder.setDescription(model.getDescription());
-                holder.setTitle(model.getTitle());
-                holder.setImage(model.getImage(), getApplicationContext());
+             @Override
+             protected void onBindViewHolder(@NonNull BlogViewHolder holder, int position, @NonNull final Blog model) {
+                 holder.setDescription(model.getDescription());
+                 holder.setTitle(model.getTitle());
+                 holder.setImage(model.getImage(), getApplicationContext());
+                 final ImageView image1=holder.image;
+                 holder.itemView.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         Intent intent=new Intent(v.getContext(),Edit_Activity.class);
+                         intent.putExtra("rowId", model.getId());
+                         intent.putExtra("title", model.getTitle());
+                         intent.putExtra("description", model.getDescription());
+                         intent.putExtra("image", model.getImage());
+                         v.getContext().startActivity(intent);
+                     }
+                 });
+final Button button=holder.share;
 
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        Context context=v.getContext();
-                        Intent intent=new Intent(context,PostActivity.class);
-                        intent.putExtra("rowId",model.getId());
-                        intent.putExtra("title",model.getTitle());
-                        intent.putExtra("description",model.getDescription());
-                        intent.putExtra("image",model.getImage());
-                        context.startActivity(intent);
-                    }
-                });
-            }
+                 button.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(final View v) {
+                         PopupMenu popup = new PopupMenu(button.getContext(),button);
+                         popup.inflate(R.menu.menu_item1);
+                         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                             @Override
+                             public boolean onMenuItemClick(MenuItem item) {
+                                 switch (item.getItemId()) {
+                                     case R.id.action_edit:
 
+                                         Context context = v.getContext();
+                                         Intent intent = new Intent(context, PostActivity.class);
+                                         intent.putExtra("rowId", model.getId());
+                                         intent.putExtra("title", model.getTitle());
+                                         intent.putExtra("description", model.getDescription());
+                                         intent.putExtra("image", model.getImage());
+                                         context.startActivity(intent);
+                                         return true;
 
-        };
-        recyclerView.setAdapter(firebaseRecyclerAdapter);
-    }
+                                     case R.id.action_share:
+                                         Intent in=new Intent(android.content.Intent.ACTION_SEND);
+                                         in.putExtra(Intent.EXTRA_TEXT,model.getDescription());
+                                         in.putExtra(Intent.EXTRA_TEXT,model.getImage());
+                                         in.setType("text/plain");
+                                         v.getContext().startActivity(Intent.createChooser(in,"share via"));
+                                         break;
+                                     case R.id.action_delete:
+                                         mDatabase.child(model.getId()).removeValue();
+                                         return true;
+                                 }
+                                 return false;
+                             }
+
+                         });
+                         popup.show();
+                     }
+
+                 });
+             }
+             };
+
+recyclerView.setAdapter(firebaseRecyclerAdapter);
+         }
 
 
     @Override
@@ -101,12 +145,16 @@ private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
     public static class BlogViewHolder extends RecyclerView.ViewHolder  {
      View mView;
     Context context;
-
-
+        Button share;
+        ImageView image;
+TextView itemTextView;
         BlogViewHolder(View itemView,Context context) {
             super(itemView);
             mView=itemView;
             this.context=context;
+share=itemView.findViewById(R.id.share);
+itemTextView=itemView.findViewById(R.id.itemTextView);
+image=itemView.findViewById(R.id.image1);
         }
 
         public void setTitle(String title){
@@ -115,9 +163,10 @@ private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
 
 
         }
-        public void setDescription(String description){
+        public void setDescription(final String description){
             TextView postDesc=mView.findViewById(R.id.text4);
             postDesc.setText(description);
+
         }
 public void setImage(String image,Context context){
 
@@ -144,4 +193,5 @@ public void setImage(String image,Context context){
 
         return super.onOptionsItemSelected(item);
     }
+
 }
