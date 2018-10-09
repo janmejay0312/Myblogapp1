@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -44,8 +45,9 @@ private RecyclerView recyclerView;
 private CardView cardView;
 private RecyclerView.LayoutManager layoutManager;
 private DatabaseReference mDatabase;
-private Query query;
-   private Button share;
+private FirebaseAuth firebaseAuth;
+private FirebaseAuth.AuthStateListener authStateListener;
+
 private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
 
     @Override
@@ -57,7 +59,20 @@ private   FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter;
         layoutManager=new LinearLayoutManager(this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(
+                getApplicationContext()
+        ));
+        firebaseAuth=FirebaseAuth.getInstance();
+        authStateListener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser()==null) {
+Intent loginIntent=new Intent(MainActivity.this,LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
+                }
+            }
+        };
         FirebaseRecyclerOptions<Blog> options =
                 new FirebaseRecyclerOptions.Builder<Blog>()
                         .setQuery(mDatabase, Blog.class)
@@ -140,6 +155,7 @@ recyclerView.setAdapter(firebaseRecyclerAdapter);
     @Override
     protected void onStart() {
         super.onStart();
+        firebaseAuth.addAuthStateListener(authStateListener);
        firebaseRecyclerAdapter.startListening();
     }
     public static class BlogViewHolder extends RecyclerView.ViewHolder  {
@@ -188,10 +204,19 @@ public void setImage(String image,Context context){
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.action_add){
             Intent intent=new Intent(MainActivity.this,PostActivity.class);
-            startActivity(intent);
-        }
+            startActivity(intent);}
+
+            if(item.getItemId()==R.id.action_logout)
+            {
+                logOut();
+            }
+
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logOut() {
+        firebaseAuth.signOut();
     }
 
 }
