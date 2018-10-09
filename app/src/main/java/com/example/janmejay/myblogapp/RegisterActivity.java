@@ -58,7 +58,7 @@ private ProgressDialog mprogressBar;
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
      String s=firebaseAuth.getCurrentUser().getUid();
-     DatabaseReference databaseReference=firebaseDatabase.child("user_id");
+     DatabaseReference databaseReference=firebaseDatabase.child(s);
      databaseReference.child("name").setValue(sName);
      mprogressBar.dismiss();
     Intent lIntent=new Intent(RegisterActivity.this,MainActivity.class);
