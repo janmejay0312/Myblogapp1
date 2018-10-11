@@ -22,22 +22,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.security.PrivateKey;
 
 public class RegisterActivity extends AppCompatActivity {
-private EditText yName,yEmail,yPassword;
-private Button register;
-private FirebaseAuth firebaseAuth;
-private DatabaseReference firebaseDatabase;
-private ProgressDialog mprogressBar;
+    private EditText yName, yEmail, yPassword;
+    private Button register;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference firebaseDatabase;
+    private ProgressDialog mprogressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        yName=findViewById(R.id.name);
-        yEmail=findViewById(R.id.Email);
-        yPassword=findViewById(R.id.password);
-        register=findViewById(R.id.register);
-        firebaseAuth=FirebaseAuth.getInstance();
-        firebaseDatabase=FirebaseDatabase.getInstance().getReference().child("User");
-        mprogressBar=new ProgressDialog(this);
+        yName = findViewById(R.id.name);
+        yEmail = findViewById(R.id.Email);
+        yPassword = findViewById(R.id.password);
+        register = findViewById(R.id.register);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance().getReference().child("User");
+        mprogressBar = new ProgressDialog(this);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,25 +48,27 @@ private ProgressDialog mprogressBar;
     }
 
     private void startForRegister() {
-        final String sName=yName.getText().toString();
-        String sEmail=yEmail.getText().toString();
-        String sPassword=yPassword.getText().toString();
-        if(!TextUtils.isEmpty(sName)&&!TextUtils.isEmpty(sEmail)&&!TextUtils.isEmpty(sPassword))
-        {  mprogressBar.setMessage("signing up");
-        mprogressBar.show();
-            firebaseAuth.createUserWithEmailAndPassword(sEmail,sPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        final String sName = yName.getText().toString();
+        String sEmail = yEmail.getText().toString();
+        String sPassword = yPassword.getText().toString();
+        if (!TextUtils.isEmpty(sName) && !TextUtils.isEmpty(sEmail) && !TextUtils.isEmpty(sPassword)) {
+            mprogressBar.setMessage("signing up");
+            mprogressBar.show();
+            firebaseAuth.createUserWithEmailAndPassword(sEmail, sPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
-     String s=firebaseAuth.getCurrentUser().getUid();
-     DatabaseReference databaseReference=firebaseDatabase.child(s);
-     databaseReference.child("name").setValue(sName);
-     mprogressBar.dismiss();
-    Intent lIntent=new Intent(RegisterActivity.this,MainActivity.class);
-    lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    startActivity(lIntent);
+                    if (task.isSuccessful()) {
+                        String s = firebaseAuth.getCurrentUser().getUid();
+                        DatabaseReference databaseReference = firebaseDatabase.child(s);
+                        databaseReference.child("name").setValue(sName);
+                        mprogressBar.dismiss();
+                        Intent lIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                        lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(lIntent);
                     }
                 }
+
+
             });
 
         }
